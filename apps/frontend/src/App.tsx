@@ -6,9 +6,8 @@ import { store } from './store';
 import AppLayout from './components/layout/AppLayout';
 
 // Use basic dummy layouts and pages to prevent crashing
-const AuthLayout = ({ children }: any) => <div className="bg-[#0a0a0f] min-h-screen flex items-center justify-center text-white">{children}</div>;
-const LoginPage = () => <div>Login Page (Placeholder)</div>;
-const RegisterPage = () => <div>Register Page (Placeholder)</div>;
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 import DashboardPage from './pages/DashboardPage';
 import AssetsPage from './pages/AssetsPage';
@@ -43,8 +42,8 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
 
             {/* Auth */}
-            <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
-            <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
             {/* App */}
             <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
