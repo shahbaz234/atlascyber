@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ComplianceScore() {
   const standards = [
     { name: 'SOC 2 Type II', score: 92 },

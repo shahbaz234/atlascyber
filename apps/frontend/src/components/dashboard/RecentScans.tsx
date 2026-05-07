@@ -1,5 +1,3 @@
-import React from 'react';
-
 const mockScans = [
   { id: 'SCN-1002', target: 'Production API Cluster', status: 'Completed', findings: 12 },
   { id: 'SCN-1003', target: 'Internal VPN Gateway', status: 'Running', findings: 0 },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UserCircleIcon, BuildingOfficeIcon, CreditCardIcon, KeyIcon } from '@heroicons/react/24/outline';
 
 const tabs = [

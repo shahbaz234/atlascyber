@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldExclamationIcon, CheckCircleIcon, ClockIcon, UserGroupIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const mockIncidents = [

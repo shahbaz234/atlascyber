@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function RiskScoreGauge({ score }: { score: number }) {
   // Mock visually stunning gauge
   const circumference = 2 * Math.PI * 45;

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const mockAlerts = [
   { id: 1, title: 'Suspicious login attempt', time: '2 mins ago', type: 'high' },
   { id: 2, title: 'Malware signature detected', time: '15 mins ago', type: 'critical' },

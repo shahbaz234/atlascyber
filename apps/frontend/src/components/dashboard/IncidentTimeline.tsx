@@ -1,5 +1,3 @@
-import React from 'react';
-
 const mockTimeline = [
   { time: '10:45 AM', title: 'Incident INC-8402 Resolved', desc: 'Malware cleaned from Endpt-02' },
   { time: '09:12 AM', title: 'New Vulnerability Detected', desc: 'CVE-2024-3094 on DB Server' },

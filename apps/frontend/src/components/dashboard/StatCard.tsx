@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/20/solid';
 
 interface StatCardProps {
@@ -16,15 +15,6 @@ const colorStyles = {
   green: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-emerald-500/10',
   orange: 'text-orange-400 bg-orange-500/10 border-orange-500/20 shadow-orange-500/10',
   purple: 'text-purple-400 bg-purple-500/10 border-purple-500/20 shadow-purple-500/10',
-};
-
-const iconColors = {
-  blue: 'text-blue-400',
-  red: 'text-rose-400',
-  yellow: 'text-amber-400',
-  green: 'text-emerald-400',
-  orange: 'text-orange-400',
-  purple: 'text-purple-400',
 };
 
 export default function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {

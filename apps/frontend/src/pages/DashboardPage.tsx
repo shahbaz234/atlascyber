@@ -1,4 +1,3 @@
-import React from 'react';
 import StatCard from '../components/dashboard/StatCard';
 import RiskScoreGauge from '../components/dashboard/RiskScoreGauge';
 import VulnerabilityChart from '../components/dashboard/VulnerabilityChart';
