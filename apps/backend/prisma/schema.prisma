@@ -1,0 +1,416 @@
+// apps/auth-service/prisma/schema.prisma
+// Master schema — run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  TENANT_ADMIN
+  SOC_ANALYST
+  SECURITY_ENGINEER
+  READ_ONLY
+  BILLING_ADMIN
+}
+
+enum AssetType {
+  SERVER
+  ENDPOINT
+  CLOUD
+  NETWORK_DEVICE
+  DATABASE
+  APPLICATION
+}
+
+enum AssetCriticality {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum AgentStatus {
+  ONLINE
+  OFFLINE
+  PENDING
+  ERROR
+}
+
+enum ScanStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+  FALSE_POSITIVE
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ComplianceStandard {
+  ISO27001
+  SOC2
+  PCI_DSS
+  HIPAA
+  GDPR
+}
+
+enum ControlStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PARTIAL
+  NOT_APPLICABLE
+}
+
+enum BillingPlan {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+// ─── Tenants ─────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  domain      String?
+  logoUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users         User[]
+  assets        Asset[]
+  scans         Scan[]
+  findings      Finding[]
+  alerts        Alert[]
+  incidents     Incident[]
+  controls      ComplianceControl[]
+  subscription  Subscription?
+  auditLogs     AuditLog[]
+
+  @@map("tenants")
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(uuid())
+  tenantId      String
+  email         String
+  passwordHash  String
+  firstName     String
+  lastName      String
+  role          Role     @default(READ_ONLY)
+  mfaEnabled    Boolean  @default(false)
+  mfaSecret     String?
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  sessions      Session[]
+  assignedIncidents Incident[] @relation("AssignedTo")
+  incidentComments IncidentComment[]
+  auditLogs     AuditLog[]
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ─── Assets ──────────────────────────────────────────────────────────────────
+
+model Asset {
+  id           String           @id @default(uuid())
+  tenantId     String
+  hostname     String
+  ipAddress    String?
+  macAddress   String?
+  os           String?
+  osVersion    String?
+  type         AssetType        @default(SERVER)
+  criticality  AssetCriticality @default(MEDIUM)
+  tags         String[]
+  owner        String?
+  location     String?
+  agentId      String?          @unique
+  agentStatus  AgentStatus      @default(PENDING)
+  agentVersion String?
+  lastSeenAt   DateTime?
+  isActive     Boolean          @default(true)
+  metadata     Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  tenant       Tenant     @relation(fields: [tenantId], references: [id])
+  scans        Scan[]
+  findings     Finding[]
+  alerts       Alert[]
+
+  @@map("assets")
+}
+
+// ─── Vulnerability Scans ─────────────────────────────────────────────────────
+
+model Scan {
+  id             String     @id @default(uuid())
+  tenantId       String
+  assetId        String?
+  name           String
+  status         ScanStatus @default(PENDING)
+  scannerType    String     @default("openvas")
+  openvasTaskId  String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  progress       Int        @default(0)
+  reportUrl      String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  tenant         Tenant     @relation(fields: [tenantId], references: [id])
+  asset          Asset?     @relation(fields: [assetId], references: [id])
+  findings       Finding[]
+
+  @@map("scans")
+}
+
+model Finding {
+  id          String   @id @default(uuid())
+  tenantId    String
+  scanId      String
+  assetId     String?
+  title       String
+  description String?
+  severity    Severity
+  cvssScore   Float?
+  cveIds      String[]
+  solution    String?
+  plugin      String?
+  port        Int?
+  protocol    String?
+  isResolved  Boolean  @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  scan        Scan     @relation(fields: [scanId], references: [id])
+  asset       Asset?   @relation(fields: [assetId], references: [id])
+
+  @@map("findings")
+}
+
+// ─── SOC Alerts ──────────────────────────────────────────────────────────────
+
+model Alert {
+  id            String      @id @default(uuid())
+  tenantId      String
+  assetId       String?
+  sourceSystem  String      // wazuh | suricata | manual
+  externalId    String?
+  title         String
+  description   String?
+  severity      Severity
+  status        AlertStatus @default(OPEN)
+  mitreAttackId String?
+  rawData       Json?
+  triggeredAt   DateTime
+  acknowledgedAt DateTime?
+  resolvedAt    DateTime?
+  createdAt     DateTime    @default(now())
+
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  asset         Asset?      @relation(fields: [assetId], references: [id])
+  incidents     IncidentAlert[]
+
+  @@map("alerts")
+}
+
+// ─── Incidents ───────────────────────────────────────────────────────────────
+
+model Incident {
+  id            String         @id @default(uuid())
+  tenantId      String
+  title         String
+  description   String?
+  severity      Severity
+  status        IncidentStatus @default(OPEN)
+  assignedToId  String?
+  slaDeadline   DateTime?
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  assignedTo    User?          @relation("AssignedTo", fields: [assignedToId], references: [id])
+  comments      IncidentComment[]
+  evidence      IncidentEvidence[]
+  alerts        IncidentAlert[]
+
+  @@map("incidents")
+}
+
+model IncidentComment {
+  id         String   @id @default(uuid())
+  incidentId String
+  userId     String
+  content    String
+  createdAt  DateTime @default(now())
+
+  incident   Incident @relation(fields: [incidentId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("incident_comments")
+}
+
+model IncidentEvidence {
+  id         String   @id @default(uuid())
+  incidentId String
+  fileName   String
+  fileUrl    String
+  fileSize   Int
+  mimeType   String
+  uploadedAt DateTime @default(now())
+
+  incident   Incident @relation(fields: [incidentId], references: [id])
+
+  @@map("incident_evidence")
+}
+
+model IncidentAlert {
+  incidentId String
+  alertId    String
+
+  incident   Incident @relation(fields: [incidentId], references: [id])
+  alert      Alert    @relation(fields: [alertId], references: [id])
+
+  @@id([incidentId, alertId])
+  @@map("incident_alerts")
+}
+
+// ─── Compliance ───────────────────────────────────────────────────────────────
+
+model ComplianceControl {
+  id          String             @id @default(uuid())
+  tenantId    String
+  standard    ComplianceStandard
+  controlId   String             // e.g. "A.8.1.1"
+  title       String
+  description String?
+  status      ControlStatus      @default(NOT_APPLICABLE)
+  evidence    String?
+  notes       String?
+  reviewedAt  DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, standard, controlId])
+  @@map("compliance_controls")
+}
+
+// ─── Billing ──────────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  tenantId             String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  plan                 BillingPlan        @default(STARTER)
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  trialEndsAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  tenant               Tenant             @relation(fields: [tenantId], references: [id])
+  invoices             Invoice[]
+
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  subscriptionId String
+  stripeInvoiceId String  @unique
+  amount         Int      // in cents
+  currency       String   @default("usd")
+  status         String
+  invoiceUrl     String?
+  paidAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@map("invoices")
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  tenantId   String
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
