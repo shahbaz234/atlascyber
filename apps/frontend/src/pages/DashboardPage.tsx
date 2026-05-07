@@ -5,13 +5,7 @@ import AlertFeed from '../components/dashboard/AlertFeed';
 import RecentScans from '../components/dashboard/RecentScans';
 import ComplianceScore from '../components/dashboard/ComplianceScore';
 import IncidentTimeline from '../components/dashboard/IncidentTimeline';
-import {
-  ShieldCheckIcon,
-  ServerIcon,
   ExclamationTriangleIcon,
-  BugAntIcon,
-  ClockIcon,
-  ChartBarIcon,
   ServerStackIcon,
   ShieldExclamationIcon,
   DocumentCheckIcon,
@@ -19,10 +13,7 @@ import {
 
 export default function DashboardPage() {
   // Mock data for UI presentation
-  const stats = { total: 142 };
-  const vulnStats = { bySeverity: { CRITICAL: 3 }, complianceScore: 89, riskScore: 78, trend: { value: 12, isPositive: true } };
-  const alertStats = { open: 14 };
-  const incidentStats = { active: 2, avgMttrHours: 4.5 };
+  const vulnStats = { riskScore: 78 };
 
   return (
     <div className="space-y-8 pb-12">
@@ -44,10 +35,10 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-        <StatCard title="Total Assets" value="2,842" icon={ServerStackIcon} color="blue" trend={{ value: 12, isUp: true }} />
-        <StatCard title="Critical Vulnerabilities" value="14" icon={ShieldExclamationIcon} color="red" trend={{ value: 4, isUp: false }} />
-        <StatCard title="Active Incidents" value="6" icon={ExclamationTriangleIcon} color="orange" trend={{ value: 2, isUp: true }} />
-        <StatCard title="Compliance Score" value="94%" icon={DocumentCheckIcon} color="green" trend={{ value: 1.2, isUp: true }} />
+        <StatCard title="Total Assets" value="2,842" icon={ServerStackIcon} color="blue" trend={{ value: 12, isPositive: true }} />
+        <StatCard title="Critical Vulnerabilities" value="14" icon={ShieldExclamationIcon} color="red" trend={{ value: 4, isPositive: false }} />
+        <StatCard title="Active Incidents" value="6" icon={ExclamationTriangleIcon} color="orange" trend={{ value: 2, isPositive: true }} />
+        <StatCard title="Compliance Score" value="94%" icon={DocumentCheckIcon} color="green" trend={{ value: 1.2, isPositive: true }} />
       </div>
 
       {/* Main Grid 1 */}

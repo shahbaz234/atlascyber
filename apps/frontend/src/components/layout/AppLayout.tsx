@@ -10,8 +10,7 @@ import {
   UserCircleIcon,
   MagnifyingGlassIcon,
   ArrowRightOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
