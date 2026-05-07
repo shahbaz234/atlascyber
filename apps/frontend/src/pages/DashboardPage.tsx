@@ -5,6 +5,7 @@ import AlertFeed from '../components/dashboard/AlertFeed';
 import RecentScans from '../components/dashboard/RecentScans';
 import ComplianceScore from '../components/dashboard/ComplianceScore';
 import IncidentTimeline from '../components/dashboard/IncidentTimeline';
+import {
   ExclamationTriangleIcon,
   ServerStackIcon,
   ShieldExclamationIcon,
