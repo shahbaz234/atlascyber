@@ -11,23 +11,18 @@ export default function IncidentsPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">Incident Response</h1>
-          <p className="text-gray-400 text-sm mt-1.5 font-medium">Track, manage, and resolve active security incidents.</p>
+          <p className="text-gray-400 text-sm mt-1.5 font-medium">Track and remediate security events in real-time</p>
         </div>
-        <div className="mt-4 md:mt-0 flex space-x-3">
-          <button className="flex items-center px-4 py-2 bg-[#1a1a24] hover:bg-[#252533] border border-[#2d2d3d] text-white text-sm font-semibold rounded-lg transition-all shadow-lg">
-             Export Report
-          </button>
-          <button className="flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-sm font-semibold rounded-lg shadow-[0_0_15px_rgba(225,29,72,0.4)] transition-all">
-            <PlusIcon className="w-4 h-4 mr-2" /> Declare Incident
-          </button>
-        </div>
+        <button className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all flex items-center justify-center">
+          <PlusIcon className="w-5 h-5 mr-2" /> Report Incident
+        </button>
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {[
           { label: 'Open Incidents', value: '4', icon: ShieldExclamationIcon, color: 'text-rose-400', bg: 'bg-rose-500/10' },
           { label: 'In Progress', value: '12', icon: ClockIcon, color: 'text-amber-400', bg: 'bg-amber-500/10' },

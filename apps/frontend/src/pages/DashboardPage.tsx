@@ -12,6 +12,9 @@ import {
   BugAntIcon,
   ClockIcon,
   ChartBarIcon,
+  ServerStackIcon,
+  ShieldExclamationIcon,
+  DocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 
 export default function DashboardPage() {
@@ -39,14 +42,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 xl:gap-6">
-        <StatCard title="Total Assets" value={stats.total} icon={ServerIcon} color="blue" />
-        <StatCard title="Critical Vulns" value={vulnStats.bySeverity.CRITICAL} icon={BugAntIcon} color="red" trend={vulnStats.trend} />
-        <StatCard title="Open Alerts" value={alertStats.open} icon={ExclamationTriangleIcon} color="yellow" />
-        <StatCard title="Active Incidents" value={incidentStats.active} icon={ShieldCheckIcon} color="orange" />
-        <StatCard title="Avg MTTR" value={`${incidentStats.avgMttrHours}h`} icon={ClockIcon} color="purple" />
-        <StatCard title="Compliance" value={`${vulnStats.complianceScore}%`} icon={ChartBarIcon} color="green" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+        <StatCard title="Total Assets" value="2,842" icon={ServerStackIcon} color="blue" trend={{ value: 12, isUp: true }} />
+        <StatCard title="Critical Vulnerabilities" value="14" icon={ShieldExclamationIcon} color="red" trend={{ value: 4, isUp: false }} />
+        <StatCard title="Active Incidents" value="6" icon={ExclamationTriangleIcon} color="orange" trend={{ value: 2, isUp: true }} />
+        <StatCard title="Compliance Score" value="94%" icon={DocumentCheckIcon} color="green" trend={{ value: 1.2, isUp: true }} />
       </div>
 
       {/* Main Grid 1 */}

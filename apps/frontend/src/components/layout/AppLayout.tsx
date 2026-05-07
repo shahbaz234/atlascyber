@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   HomeIcon, 
@@ -8,7 +9,9 @@ import {
   BellIcon,
   UserCircleIcon,
   MagnifyingGlassIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -20,12 +23,25 @@ const navigation = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden relative">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-[#111118] border-r border-[#1f1f2e] flex flex-col transition-all duration-300 shadow-2xl relative z-20">
+      <div className={`
+        fixed inset-y-0 left-0 w-64 bg-[#111118] border-r border-[#1f1f2e] flex flex-col transition-all duration-300 shadow-2xl z-50
+        lg:static lg:translate-x-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
         <div className="h-16 flex items-center px-6 border-b border-[#1f1f2e] bg-gradient-to-r from-[#111118] to-[#151520]">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
             <ShieldExclamationIcon className="w-5 h-5 text-white" />
@@ -81,16 +97,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col relative z-10 overflow-hidden bg-gradient-to-b from-[#0a0a0f] to-[#0d0d14]">
+      <div className="flex-1 flex flex-col relative z-10 overflow-hidden bg-gradient-to-b from-[#0a0a0f] to-[#0d0d14] w-full">
         {/* Topbar */}
-        <header className="h-16 flex items-center justify-between px-8 border-b border-[#1f1f2e] bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-30">
-          <div className="flex items-center bg-[#111118] border border-[#1f1f2e] rounded-lg px-3 py-1.5 w-96 focus-within:ring-1 focus-within:ring-cyan-500/50 focus-within:border-cyan-500/50 transition-all">
-            <MagnifyingGlassIcon className="h-4 w-4 text-gray-500" />
-            <input 
-              type="text" 
-              placeholder="Search assets, alerts, or IPs..." 
-              className="bg-transparent border-none focus:ring-0 text-sm text-gray-200 w-full ml-2 placeholder-gray-600 py-1"
-            />
+        <header className="h-16 flex items-center justify-between px-4 lg:px-8 border-b border-[#1f1f2e] bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center space-x-4">
+            <button 
+              className="lg:hidden p-2 rounded-lg text-gray-400 hover:bg-[#1f1f2e]"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Bars3Icon className="h-6 w-6" />
+            </button>
+            <div className="hidden sm:flex items-center bg-[#111118] border border-[#1f1f2e] rounded-lg px-3 py-1.5 w-64 lg:w-96 focus-within:ring-1 focus-within:ring-cyan-500/50 transition-all">
+              <MagnifyingGlassIcon className="h-4 w-4 text-gray-500" />
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="bg-transparent border-none focus:ring-0 text-sm text-gray-200 w-full ml-2 placeholder-gray-600 py-1"
+              />
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <button className="relative p-2 rounded-full text-gray-400 hover:text-white hover:bg-[#1f1f2e] transition-colors">
@@ -103,8 +127,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full lg:w-[800px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
           {children}
         </main>
       </div>

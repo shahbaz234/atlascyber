@@ -91,7 +91,7 @@ export default function CompliancePage() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-left min-w-[800px]">
             <thead className="text-xs text-gray-400 uppercase bg-[#0a0a0f]">
               <tr>
                 <th className="px-6 py-4 font-semibold">Control ID</th>
